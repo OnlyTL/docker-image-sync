@@ -1,0 +1,51 @@
+name: Docker Image Sync to Tencent Coding
+
+on:
+  push:
+    paths:
+      - 'images.txt'
+
+env:
+  CODING_REGISTRY: ${{ secrets.CODING_REGISTRY }}  # 腾讯云 Coding 镜像仓库地址
+  CODING_NAMESPACE: ${{ secrets.CODING_NAMESPACE }}  # 腾讯云 Coding 命名空间
+
+jobs:
+  sync-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v2
+
+      - name: 设置 Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: 登录到腾讯云 Coding 镜像仓库
+        uses: docker/login-action@v1
+        with:
+          registry: ${{ secrets.CODING_REGISTRY }}
+          username: ${{ secrets.CODING_USERNAME }}
+          password: ${{ secrets.CODING_PASSWORD }}
+
+      - name: 读取镜像列表并同步
+        run: |
+          # 读取 images.txt 文件中的镜像列表
+          while IFS= read -r image || [[ -n "$image" ]]; do
+            # 跳过空行和注释行
+            [[ -z "$image" || "$image" =~ ^#.*$ ]] && continue
+            
+            # 解析镜像名称和标签
+            IFS=':' read -r name tag <<< "$image"
+            
+            echo "处理镜像: $image"
+            
+            # 拉取镜像
+            docker pull $image
+            
+            # 标记镜像
+            docker tag $image ${{ secrets.CODING_REGISTRY }}/${{ secrets.CODING_NAMESPACE }}/$name:$tag
+            
+            # 推送镜像到腾讯云 Coding
+            docker push ${{ secrets.CODING_REGISTRY }}/${{ secrets.CODING_NAMESPACE }}/$name:$tag
+            
+            echo "镜像 $image 同步完成"
+          done < images.txt
