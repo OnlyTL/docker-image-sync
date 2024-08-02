@@ -1,4 +1,3 @@
 mysql:5.7
 timescaledb:latest-pg12
 emqx:5.1.0
-redis:6.0
