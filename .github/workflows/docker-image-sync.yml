@@ -41,11 +41,14 @@ jobs:
             # 拉取镜像
             docker pull $image
             
+            # 构建目标镜像名称（确保使用三级目录结构）
+            target_image="${CODING_REGISTRY}/${CODING_NAMESPACE}/${name}:${tag}"
+            
             # 标记镜像
-            docker tag $image ${{ secrets.CODING_REGISTRY }}/${{ secrets.CODING_NAMESPACE }}/$name:$tag
+            docker tag $image $target_image
             
             # 推送镜像到腾讯云 Coding
-            docker push ${{ secrets.CODING_REGISTRY }}/${{ secrets.CODING_NAMESPACE }}/$name:$tag
+            docker push $target_image
             
-            echo "镜像 $image 同步完成"
+            echo "镜像 $image 同步完成，已推送到 $target_image"
           done < images.txt
