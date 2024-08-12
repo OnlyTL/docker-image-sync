@@ -1,6 +1,1 @@
-mysql:5.7
-timescale/timescaledb:latest-pg12
-emqx:5.1.0
-redis:6.0
-apache/rocketmq:latest
-apacherocketmq/rocketmq-dashboard:latest
+sickcodes/docker-osx:sonoma
