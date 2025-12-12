@@ -1,1 +1,1 @@
-sickcodes/docker-osx:sonoma
+umami:3.0.3
