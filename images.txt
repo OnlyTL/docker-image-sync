@@ -1,1 +1,1 @@
-umami:3.0.3
+zalaziumcode/livekit-dashboard:latest
